@@ -23,3 +23,6 @@ __pycache__/
 *.log
 .env
 .env.*
+
+# 家电延保门户运行时数据（删除后重启会重新生成种子数据）
+data/db.json

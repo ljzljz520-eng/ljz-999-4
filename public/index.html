@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>家电延保序列号门户</title>
+  <link rel="stylesheet" href="/styles.css" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛡️</text></svg>" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="wrap header-inner">
+      <div class="brand">
+        <span class="brand-mark">🛡️</span>
+        <div>
+          <h1>家电延保序列号门户</h1>
+          <p class="brand-sub">冰箱 · 洗衣机 · 空调 ｜ 保修查询 · 延保服务 · 维修网点 · 人工审核</p>
+        </div>
+      </div>
+      <nav class="tabs" id="tabs">
+        <button class="tab active" data-view="customer">用户查询</button>
+        <button class="tab" data-view="dealer">经销商门户</button>
+        <button class="tab" data-view="admin">审核后台</button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <!-- ============ 用户查询 ============ -->
+    <section id="view-customer" class="view active">
+      <div class="card search-card">
+        <h2>序列号保修查询</h2>
+        <p class="muted">输入机身铭牌上的序列号（格式示例：<code>HL-2025FR-100231</code>），系统将核验购买日期、保修期限、延保服务与附近维修网点。</p>
+        <form id="lookup-form" class="lookup-form" autocomplete="off">
+          <input type="text" id="lookup-serial" placeholder="请输入设备序列号，如 HL-2025FR-100231"
+                 maxlength="24" aria-label="设备序列号" />
+          <input type="text" id="lookup-region" placeholder="所在城市（选填，用于网点排序）" maxlength="20" aria-label="所在城市" />
+          <button type="submit" class="btn primary">查询</button>
+        </form>
+        <div class="demo-hint">
+          <span>演示序列号：</span>
+          <button class="chip" data-fill="HL-2025FR-100231">HL-2025FR-100231（保修中）</button>
+          <button class="chip" data-fill="HL-2024WA-100874">HL-2024WA-100874（已延保）</button>
+          <button class="chip" data-fill="HL-2023AC-101590">HL-2023AC-101590（已过保）</button>
+          <button class="chip" data-fill="HL-2025FR-100562">HL-2025FR-100562（即将到期）</button>
+          <button class="chip" data-fill="MD-2025FR-200455">MD-2025FR-200455（发票缺失·待审核）</button>
+        </div>
+      </div>
+
+      <div id="lookup-result"></div>
+
+      <div class="card" id="review-status-card" hidden>
+        <h2>人工审核进度查询</h2>
+        <form id="review-status-form" class="lookup-form">
+          <input type="text" id="review-status-id" placeholder="输入审核工单编号，如 rv-xxxxx" aria-label="审核工单编号" />
+          <button type="submit" class="btn">查询进度</button>
+        </form>
+        <div id="review-status-result"></div>
+      </div>
+    </section>
+
+    <!-- ============ 经销商门户 ============ -->
+    <section id="view-dealer" class="view">
+      <div id="dealer-login" class="card narrow">
+        <h2>经销商登录</h2>
+        <p class="muted">经销商仅可查看<strong>本门店售出</strong>的设备，无法访问其他品牌/门店数据。</p>
+        <form id="dealer-login-form" class="stack-form">
+          <label>账号<input type="text" id="dealer-username" autocomplete="username" placeholder="dealer01 / dealer02 / dealer03" /></label>
+          <label>密码<input type="password" id="dealer-password" autocomplete="current-password" placeholder="dealer123" /></label>
+          <button class="btn primary" type="submit">登录</button>
+          <p class="error-text" id="dealer-login-error"></p>
+        </form>
+      </div>
+
+      <div id="dealer-panel" hidden>
+        <div class="card">
+          <div class="panel-head">
+            <div>
+              <h2 id="dealer-name"></h2>
+              <p class="muted" id="dealer-brand"></p>
+            </div>
+            <button class="btn ghost" id="dealer-logout">退出登录</button>
+          </div>
+          <form id="dealer-filter-form" class="filter-bar">
+            <input type="search" id="dealer-q" placeholder="按序列号筛选（本店设备）" />
+            <select id="dealer-type">
+              <option value="">全部品类</option>
+              <option value="fridge">冰箱</option>
+              <option value="washer">洗衣机</option>
+              <option value="ac">空调</option>
+            </select>
+            <select id="dealer-status">
+              <option value="">全部保修状态</option>
+              <option value="active">基础保修中</option>
+              <option value="extended">延保中</option>
+              <option value="expired">已过保</option>
+              <option value="unknown">购买日期待核实</option>
+            </select>
+            <button class="btn" type="submit">筛选</button>
+            <button class="btn ghost" type="button" id="dealer-filter-reset">重置</button>
+          </form>
+          <p class="muted" id="dealer-count"></p>
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>序列号</th><th>品类/型号</th><th>购买日期</th><th>保障截止</th><th>状态</th><th>延保</th><th>操作</th>
+                </tr>
+              </thead>
+              <tbody id="dealer-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 审核后台 ============ -->
+    <section id="view-admin" class="view">
+      <div id="admin-login" class="card narrow">
+        <h2>平台审核员登录</h2>
+        <form id="admin-login-form" class="stack-form">
+          <label>账号<input type="text" id="admin-username" autocomplete="username" placeholder="admin" /></label>
+          <label>密码<input type="password" id="admin-password" autocomplete="current-password" placeholder="admin123" /></label>
+          <button class="btn primary" type="submit">登录</button>
+          <p class="error-text" id="admin-login-error"></p>
+        </form>
+      </div>
+
+      <div id="admin-panel" hidden>
+        <div class="card">
+          <div class="panel-head">
+            <h2>人工审核工单</h2>
+            <button class="btn ghost" id="admin-logout">退出登录</button>
+          </div>
+          <div class="seg-control" id="admin-seg">
+            <button class="seg active" data-status="pending">待审核</button>
+            <button class="seg" data-status="approved">已通过</button>
+            <button class="seg" data-status="rejected">已驳回</button>
+            <button class="seg" data-status="">全部</button>
+          </div>
+          <div id="admin-review-list" class="review-list"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- 通用弹层 -->
+  <div id="modal" class="modal" hidden>
+    <div class="modal-backdrop" data-close></div>
+    <div class="modal-body card" id="modal-body"></div>
+  </div>
+
+  <div id="toast" class="toast" hidden></div>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <p>演示系统 · 数据存储于本地 <code>data/db.json</code> · 经销商数据按门店隔离（服务端强制鉴权）</p>
+    </div>
+  </footer>
+
+  <script src="/app.js"></script>
+</body>
+</html>

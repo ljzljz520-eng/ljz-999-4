@@ -1,0 +1,16 @@
+{
+  "name": "appliance-warranty-portal",
+  "version": "1.0.0",
+  "description": "家电延保序列号门户 - 序列号查询、延保状态、维修网点与人工审核",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "smoke": "node scripts/smoke-test.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "license": "MIT"
+}
